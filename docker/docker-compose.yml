@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  crudgenerator-db:
+    container_name: crudgenerator_db
+    image: postgres
+    restart: 'unless-stopped'
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DATABASE: 'crudgenerator'
+    expose:
+      - '5432'
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./.docker/data:/var/lib/postgresql/data
+      - ./.docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - crudgenerator-network
+
+  crudgenerator-db-admin:
+    container_name: crudgenerator_db_admin
+    image: dpage/pgadmin4
+    restart: 'unless-stopped'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - '5050:80'
+    networks:
+      - crudgenerator-network
+    depends_on:
+      - crudgenerator_db
+
+networks:
+  crudgenerator-network:
+    name: crudgenerator_network
+    driver: bridge

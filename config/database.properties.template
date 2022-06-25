@@ -1,0 +1,31 @@
+# database
+database.url=
+
+# persistence unit name
+persistence.unit.name=
+
+# class directories
+entityClass.dir=
+daoClass.dir=
+exampleClass.dir=
+applicationClass.dir=
+
+# examples
+
+# database.url example:
+#     database.url=jdbc:type://host:port/name?user=user&password=password
+
+# persistence.unit.name example:
+#     persistence.unit.name=crudgenerator
+
+# entityClass.dir example:
+#     entityClass.dir=src/main/java/entity
+
+# daoClass.dir example:
+#     daoClass.dir=src/main/java/dao
+
+# exampleClass.dir example:
+#     exampleClass.dir=src/main/java/example
+
+# applicationClass.dir example
+#     applicationClass.dir=src/main/java

@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS "Regiao";
+
+DROP TABLE IF EXISTS "Estado";
+
+DROP TABLE IF EXISTS "Municipio";
