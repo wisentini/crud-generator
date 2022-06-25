@@ -1,6 +1,6 @@
 # crudgenerator
 
-Projeto em Java que lê metadados de um banco de dados e gera três tipos de classes (entidade, [DAO][dao-wikipedia] e exemplo) para cada tabela do esquema, além de uma classe responsável pela utilização das outras classes geradas.
+Projeto em Java que lê metadados de um banco de dados e gera três tipos de classe (entidade, [DAO][dao-wikipedia] e exemplo) para cada tabela do esquema, além de uma classe responsável pela utilização das outras classes geradas.
 
 ## Pré-requisitos
 
@@ -14,7 +14,7 @@ Para rodar o projeto, você precisará das seguintes tecnologias à sua disposi�
 
 - Os arquivos `config/database.properties` e `src/main/resources/META-INF/persistence.xml` contém informações críticas para a correta execução do programa, portanto, certifique-se de que eles refletem suas intenções.
 
-- O banco de dados de teste é gerenciado de forma automática pelo Hibernate por meio de scripts SQL predefinidos em `src/main/resources/sql`. Caso você opte por utilizar outro banco de dados ou um esquema diferente, não se esqueça de alterar esses scripts. Além disso, verifique se os arquivos mencionados no item anterior dessa lista ainda fazem sentido após quaisquer mudanças.
+- O banco de dados de teste é gerenciado de forma automática pelo [Hibernate][hibernate] por meio de scripts SQL predefinidos em `src/main/resources/sql`. Caso você opte por utilizar outro banco de dados ou um esquema diferente, não se esqueça de alterar esses scripts. Além disso, verifique se os arquivos mencionados no item anterior dessa lista ainda fazem sentido após quaisquer mudanças.
 
 ### Esquema
 
@@ -96,4 +96,5 @@ Clique [aqui][video] para ver um vídeo do projeto sendo executado.
 [docker]: https://www.docker.com/ "Docker"
 [java]: https://www.java.com/ "Java"
 [maven]: https://maven.apache.org/ "Maven"
+[hibernate]: https://hibernate.org/ "Hibernate"
 [video]: https://www.youtube.com/watch?v=Hh76WF---Dk
