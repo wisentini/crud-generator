@@ -9,67 +9,65 @@ import services.composer.entity.Parameter;
 import services.composer.entity.Annotation;
 import services.composer.entity.AnnotationElement;
 import util.ClassUtil;
+import util.StringUtil;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class EntityClassComposer {
     public static EntityClass composeClass(TableMetadata tableMetadata, String classPackage) {
-        var attributes = composeAttributes(tableMetadata);
-        var className = tableMetadata.getName();
-        var methods = composeMethods(className, attributes);
-        var annotations = composeClassAnnotations(className);
+        List<Attribute> attributes = composeAttributes(tableMetadata);
+        String className = tableMetadata.getName();
+        List<Method> methods = composeMethods(className, attributes);
+        List<Annotation> annotations = composeClassAnnotations(className);
 
-        var imports = List.of("javax.persistence.*");
-        var modifiers = List.of(Modifier.PUBLIC);
-        var primaryKeyColumn = tableMetadata.getPrimaryKeyColumn();
-        var primaryKeyColumnClass = primaryKeyColumn.getTypeClass();
-        var wrapperClass = ClassUtil.getWrapperClass(primaryKeyColumnClass);
-        var wrapperClassName = wrapperClass.getSimpleName();
-        var classesToExtend = new ArrayList<String>();
-        var baseEntityInterface = String.format("BaseEntity<%s>", wrapperClassName);
-        var classesToImplement = List.of(baseEntityInterface);
+        List<String> imports = List.of("javax.persistence.*");
+        List<Integer> modifiers = List.of(Modifier.PUBLIC);
+        ColumnMetadata primaryKeyColumn = tableMetadata.getPrimaryKeyColumn();
+        Class<?> primaryKeyColumnClass = primaryKeyColumn.getTypeClass();
+        Class<?> wrapperClass = ClassUtil.getWrapperClass(primaryKeyColumnClass);
+        String wrapperClassName = wrapperClass.getSimpleName();
+        List<String> classesToExtend = new ArrayList<>();
+        String baseEntityInterface = String.format("BaseEntity<%s>", wrapperClassName);
+        List<String> classesToImplement = List.of(baseEntityInterface);
 
-        var entityClass = new EntityClass(imports, classPackage, annotations, modifiers, className, attributes, methods, classesToExtend, classesToImplement, primaryKeyColumnClass);
-        return entityClass;
+        return new EntityClass(imports, classPackage, annotations, modifiers, className, attributes, methods, classesToExtend, classesToImplement, primaryKeyColumnClass);
     }
 
     public static List<Annotation> composeClassAnnotations(String className) {
-        var entityAnnotation = new Annotation("Entity");
+        Annotation entityAnnotation = new Annotation("Entity");
 
-        var tableAnnotationNameElementName = "name";
-        var tableAnnotationNameElementValue = String.format("\"`%s`\"", className);
-        var tableAnnotationNameElement = new AnnotationElement(tableAnnotationNameElementName, tableAnnotationNameElementValue);
+        String tableAnnotationNameElementName = "name";
+        String tableAnnotationNameElementValue = String.format("\"`%s`\"", className);
+        AnnotationElement tableAnnotationNameElement = new AnnotationElement(tableAnnotationNameElementName, tableAnnotationNameElementValue);
 
-        var tableAnnotationSchemaElementName = "schema";
-        var tableAnnotationSchemaElementValue = "\"public\"";
-        var tableAnnotationSchemaElement = new AnnotationElement(tableAnnotationSchemaElementName, tableAnnotationSchemaElementValue);
+        String tableAnnotationSchemaElementName = "schema";
+        String tableAnnotationSchemaElementValue = "\"public\"";
+        AnnotationElement tableAnnotationSchemaElement = new AnnotationElement(tableAnnotationSchemaElementName, tableAnnotationSchemaElementValue);
 
-        var tableAnnotationElements = List.of(tableAnnotationNameElement, tableAnnotationSchemaElement);
+        List<AnnotationElement> tableAnnotationElements = List.of(tableAnnotationNameElement, tableAnnotationSchemaElement);
 
-        var tableAnnotation = new Annotation("Table", tableAnnotationElements);
+        Annotation tableAnnotation = new Annotation("Table", tableAnnotationElements);
 
-        var annotations = List.of(entityAnnotation, tableAnnotation);
-        return annotations;
+        return List.of(entityAnnotation, tableAnnotation);
     }
 
     private static List<Method> composeMethods(String className, List<Attribute> attributes) {
-        var constructor = composeConstructor(className, attributes);
+        Method constructor = composeConstructor(className, attributes);
 
-        var emptyConstructorAttributes = new ArrayList<Attribute>();
-        var emptyConstructor = composeConstructor(className, emptyConstructorAttributes);
+        List<Attribute> emptyConstructorAttributes = new ArrayList<Attribute>();
+        Method emptyConstructor = composeConstructor(className, emptyConstructorAttributes);
 
-        var partialConstructor = composePartialConstructor(className, attributes);
+        Method partialConstructor = composePartialConstructor(className, attributes);
 
-        var getters = composeGetters(attributes);
-        var setters = composeSetters(attributes);
+        List<Method> getters = composeGetters(attributes);
+        List<Method> setters = composeSetters(attributes);
 
-        var toStringMethod = composeToStringMethod(attributes);
+        Method toStringMethod = composeToStringMethod(attributes);
 
-        var methods = new ArrayList<Method>();
+        List<Method> methods = new ArrayList<>();
 
         methods.add(emptyConstructor);
         methods.add(partialConstructor);
@@ -82,62 +80,60 @@ public class EntityClassComposer {
     }
 
     private static Attribute composeAttribute(ColumnMetadata columnMetadata) {
-        var columnName = columnMetadata.getName();
-        var columnType = columnMetadata.getTypeClassName();
-        var columnSize = columnMetadata.getSize();
-        var columnIsPrimaryKey = columnMetadata.getIsPrimaryKey();
+        String columnName = columnMetadata.getName();
+        String columnType = columnMetadata.getTypeClassName();
+        int columnSize = columnMetadata.getSize();
+        boolean columnIsPrimaryKey = columnMetadata.getIsPrimaryKey();
 
-        var attributeName = columnName;
+        String attributeName = columnName;
 
-        var columnAnnotationElementName = "name";
-        var columnAnnotationElementValue = String.format("\"`%s`\"", columnName);
-        var columnAnnotationElement = new AnnotationElement(columnAnnotationElementName, columnAnnotationElementValue);
-        var columnAnnotationName = "Column";
-        var columnAnnotationElements = List.of(columnAnnotationElement);
-        var columnAnnotation = new Annotation(columnAnnotationName, columnAnnotationElements);
+        String columnAnnotationElementName = "name";
+        String columnAnnotationElementValue = String.format("\"`%s`\"", columnName);
+        AnnotationElement columnAnnotationElement = new AnnotationElement(columnAnnotationElementName, columnAnnotationElementValue);
+        String columnAnnotationName = "Column";
+        List<AnnotationElement> columnAnnotationElements = List.of(columnAnnotationElement);
+        Annotation columnAnnotation = new Annotation(columnAnnotationName, columnAnnotationElements);
 
-        var annotations = new LinkedList<>(List.of(columnAnnotation));
-        var modifiers = List.of(Modifier.PRIVATE);
+        LinkedList<Annotation> annotations = new LinkedList<>(List.of(columnAnnotation));
+        List<Integer> modifiers = List.of(Modifier.PRIVATE);
 
         if (columnIsPrimaryKey) {
-            var generatedValueElementName = "strategy";
-            var generatedValueElementValue = "GenerationType.IDENTITY";
-            var generatedValueElement = new AnnotationElement(generatedValueElementName, generatedValueElementValue);
-            var generatedValueAnnotationName = "GeneratedValue";
-            var generatedValueElements = List.of(generatedValueElement);
-            var generatedValueAnnotation = new Annotation(generatedValueAnnotationName, generatedValueElements);
+            String generatedValueElementName = "strategy";
+            String generatedValueElementValue = "GenerationType.IDENTITY";
+            AnnotationElement generatedValueElement = new AnnotationElement(generatedValueElementName, generatedValueElementValue);
+            String generatedValueAnnotationName = "GeneratedValue";
+            List<AnnotationElement> generatedValueElements = List.of(generatedValueElement);
+            Annotation generatedValueAnnotation = new Annotation(generatedValueAnnotationName, generatedValueElements);
             annotations.addFirst(generatedValueAnnotation);
 
-            var idAnnotationName = "Id";
-            var idAnnotation = new Annotation(idAnnotationName);
+            String idAnnotationName = "Id";
+            Annotation idAnnotation = new Annotation(idAnnotationName);
             annotations.addFirst(idAnnotation);
 
             attributeName = "id";
         }
 
-        var attribute = new Attribute(attributeName, columnType, columnSize, columnIsPrimaryKey, annotations, modifiers, columnName);
-        return attribute;
+        return new Attribute(attributeName, columnType, columnSize, columnIsPrimaryKey, annotations, modifiers, columnName);
     }
 
     private static List<Attribute> composeAttributes(TableMetadata tableMetadata) {
-        var columnsMetadata = tableMetadata.getColumnsMetadata();
-        var attributes = new ArrayList<Attribute>();
+        List<ColumnMetadata> columnsMetadata = tableMetadata.getColumnsMetadata();
+        List<Attribute> attributes = new ArrayList<>();
 
-        for (var columnMetadata : columnsMetadata) {
-            var attribute = composeAttribute(columnMetadata);
-            attributes.add(attribute);
+        for (ColumnMetadata columnMetadata : columnsMetadata) {
+            attributes.add(composeAttribute(columnMetadata));
         }
 
         return attributes;
     }
 
     private static String composeConstructorBody(List<Attribute> attributes) {
-        var constructorBodyBuilder = new StringBuilder();
+        StringBuilder constructorBodyBuilder = new StringBuilder();
 
-        for (var attribute : attributes) {
-            var attributeName = attribute.getName();
-            var attributeColumnName = attribute.getColumnName();
-            var constructorBody = "";
+        for (Attribute attribute : attributes) {
+            String attributeName = attribute.getName();
+            String attributeColumnName = attribute.getColumnName();
+            String constructorBody = "";
 
             if (attribute.getIsPrimaryKey()) {
                 constructorBody = String.format("this.id = %s;\n", attributeColumnName);
@@ -148,17 +144,16 @@ public class EntityClassComposer {
             constructorBodyBuilder.append(constructorBody);
         }
 
-        var constructorBody = constructorBodyBuilder.toString();
-        return constructorBody;
+        return constructorBodyBuilder.toString();
     }
 
     private static String composePartialConstructorBody(List<Attribute> attributes) {
-        var constructorBodyBuilder = new StringBuilder();
+        StringBuilder constructorBodyBuilder = new StringBuilder();
 
-        for (var attribute : attributes) {
-            var attributeName = attribute.getName();
-            var attributeIsPrimaryKey = attribute.getIsPrimaryKey();
-            var constructorBody = "";
+        for (Attribute attribute : attributes) {
+            String attributeName = attribute.getName();
+            boolean attributeIsPrimaryKey = attribute.getIsPrimaryKey();
+            String constructorBody = "";
 
             if (!attributeIsPrimaryKey) {
                 constructorBody = String.format("this.%s = %s;\n", attributeName, attributeName);
@@ -167,18 +162,17 @@ public class EntityClassComposer {
             constructorBodyBuilder.append(constructorBody);
         }
 
-        var constructorBody = constructorBodyBuilder.toString();
-        return constructorBody;
+        return constructorBodyBuilder.toString();
     }
 
     private static List<Parameter> composeParameters(List<Attribute> attributes) {
-        var parameters = new ArrayList<Parameter>();
+        List<Parameter> parameters = new ArrayList<>();
 
-        for (var attribute : attributes) {
-            var attributeColumnName = attribute.getColumnName();
-            var attributeType = attribute.getType();
-            var attributeIsPrimaryKey = attribute.getIsPrimaryKey();
-            var parameter = new Parameter(attributeColumnName, attributeType, attributeIsPrimaryKey);
+        for (Attribute attribute : attributes) {
+            String attributeColumnName = attribute.getColumnName();
+            String attributeType = attribute.getType();
+            boolean attributeIsPrimaryKey = attribute.getIsPrimaryKey();
+            Parameter parameter = new Parameter(attributeColumnName, attributeType, attributeIsPrimaryKey);
             parameters.add(parameter);
         }
 
@@ -186,125 +180,113 @@ public class EntityClassComposer {
     }
 
     private static Method composePartialConstructor(String name, List<Attribute> attributes) {
-        var modifiers = List.of(Modifier.PUBLIC);
-        var thrownExceptions = new ArrayList<String>();
-        var returnType = "";
-        var parameters = composeParameters(attributes).stream().filter(parameter -> !parameter.getIsPrimaryKey()).toList();
-        var body = composePartialConstructorBody(attributes);
+        List<Integer> modifiers = List.of(Modifier.PUBLIC);
+        List<String> thrownExceptions = new ArrayList<>();
+        String returnType = "";
+        List<Parameter> parameters = composeParameters(attributes).stream().filter(parameter -> !parameter.getIsPrimaryKey()).toList();
+        String body = composePartialConstructorBody(attributes);
 
-        var method = new Method(modifiers, thrownExceptions, returnType, name, parameters, body);
-        return method;
+        return new Method(modifiers, thrownExceptions, returnType, name, parameters, body);
     }
 
     private static Method composeConstructor(String name, List<Attribute> attributes) {
-        var modifiers = List.of(Modifier.PUBLIC);
-        var thrownExceptions = new ArrayList<String>();
-        var returnType = "";
-        var parameters = composeParameters(attributes);
-        var body = composeConstructorBody(attributes);
+        List<Integer> modifiers = List.of(Modifier.PUBLIC);
+        List<String> thrownExceptions = new ArrayList<>();
+        String returnType = "";
+        List<Parameter> parameters = composeParameters(attributes);
+        String body = composeConstructorBody(attributes);
 
-        var method = new Method(modifiers, thrownExceptions, returnType, name, parameters, body);
-        return method;
+        return new Method(modifiers, thrownExceptions, returnType, name, parameters, body);
     }
 
     private static Method composeGetter(Attribute attribute) {
-        var attributeIsPrimaryKey = attribute.getIsPrimaryKey();
-        var attributeType = attribute.getType();
+        boolean attributeIsPrimaryKey = attribute.getIsPrimaryKey();
+        String attributeType = attribute.getType();
 
         if (attributeIsPrimaryKey) {
-            var attributeTypeWrapperClass = ClassUtil.getWrapperClassFromPrimitiveClassString(attributeType);
+            Class<?> attributeTypeWrapperClass = ClassUtil.getWrapperClassFromPrimitiveClassString(attributeType);
             attributeType = attributeTypeWrapperClass.getSimpleName();
         }
 
-        var modifiers = List.of(Modifier.PUBLIC);
-        var thrownExceptions = new ArrayList<String>();
-        var returnType = attributeType;
-        var attributeName = attribute.getName();
-        var parameters = new ArrayList<Parameter>();
-        var name = String.format("get%s", attributeName);
-        var body = String.format("return this.%s;", attributeName);
+        List<Integer> modifiers = List.of(Modifier.PUBLIC);
+        List<String> thrownExceptions = new ArrayList<>();
+        String returnType = attributeType;
+        String attributeName = attribute.getName();
+        List<Parameter> parameters = new ArrayList<>();
+        String name = StringUtil.composeGetterMethodName(attributeName);
+        String body = String.format("return this.%s;", attributeName);
 
-        var method = new Method(modifiers, thrownExceptions, returnType, name, parameters, body);
-        return method;
+        return new Method(modifiers, thrownExceptions, returnType, name, parameters, body);
     }
 
     private static List<Method> composeGetters(List<Attribute> attributes) {
-        var getters = new ArrayList<Method>();
+        List<Method> getters = new ArrayList<>();
 
-        for (var attribute : attributes) {
-            var getter = composeGetter(attribute);
-            getters.add(getter);
+        for (Attribute attribute : attributes) {
+            getters.add(composeGetter(attribute));
         }
 
         return getters;
     }
 
     private static Method composeSetter(Attribute attribute) {
-        var modifiers = List.of(Modifier.PUBLIC);
-        var thrownExceptions = new ArrayList<String>();
-        var returnType = "void";
-        var attributeName = attribute.getName();
-        var parameter = new Parameter(attribute);
-        var parameters = List.of(parameter);
-        var name = String.format("set%s", attributeName);
-        var body = String.format("this.%s = %s;", attributeName, attributeName);
+        List<Integer> modifiers = List.of(Modifier.PUBLIC);
+        List<String> thrownExceptions = new ArrayList<>();
+        String returnType = "void";
+        String attributeName = attribute.getName();
+        Parameter parameter = new Parameter(attribute);
+        List<Parameter> parameters = List.of(parameter);
+        String name = StringUtil.composeSetterMethodName(attributeName);
+        String body = String.format("this.%s = %s;", attributeName, attributeName);
 
-        var method = new Method(modifiers, thrownExceptions, returnType, name, parameters, body);
-        return method;
+        return new Method(modifiers, thrownExceptions, returnType, name, parameters, body);
     }
 
     private static List<Method> composeSetters(List<Attribute> attributes) {
-        var setters = new ArrayList<Method>();
+        List<Method> setters = new ArrayList<>();
 
-        for (var attribute : attributes) {
-            if (attribute.getIsPrimaryKey()) {
-                continue;
+        for (Attribute attribute : attributes) {
+            if (!attribute.getIsPrimaryKey()) {
+                setters.add(composeSetter(attribute));
             }
-
-            var setter = composeSetter(attribute);
-            setters.add(setter);
         }
 
         return setters;
     }
 
     private static String composeToStringMethodBody(List<Attribute> attributes) {
-        var placeholders = new ArrayList<String>();
-        var values = new ArrayList<String>();
+        List<String> placeholders = new ArrayList<>();
+        List<String> values = new ArrayList<>();
 
-        for (var attribute : attributes) {
-            var attributeName = attribute.getName();
-            var attributeColumnName = attribute.getColumnName();
-            var placeholder = String.format("%s: %%s", attributeColumnName);
-            var value = String.format("this.%s", attributeName);
+        for (Attribute attribute : attributes) {
+            String attributeName = attribute.getName();
+            String attributeColumnName = attribute.getColumnName();
+            String placeholder = String.format("%s: %%s", attributeColumnName);
+            String value = String.format("this.%s", attributeName);
 
             placeholders.add(placeholder);
             values.add(value);
         }
 
-        var placeholdersString = String.join(", ", placeholders);
-        var valuesString = String.join(", ", values);
+        String placeholdersString = String.join(", ", placeholders);
+        String valuesString = String.join(", ", values);
 
-        var toStringMethodBody = """
-                var className = this.getClass().getSimpleName();
-                var string = String.format("%%s(%s)", className, %s);
-                return string;
-                """.formatted(placeholdersString, valuesString);
-
-        return toStringMethodBody;
+        return """
+            String className = this.getClass().getSimpleName();
+            return String.format("%%s(%s)", className, %s);
+        """.formatted(placeholdersString, valuesString);
     }
 
     private static Method composeToStringMethod(List<Attribute> attributes) {
-        var overrideAnnotation = new Annotation("Override");
-        var annotations = List.of(overrideAnnotation);
-        var modifiers = List.of(Modifier.PUBLIC);
-        var thrownExceptions = new ArrayList<String>();
-        var returnType = "String";
-        var name = "toString";
-        var parameters = new ArrayList<Parameter>();
-        var body = composeToStringMethodBody(attributes);
+        Annotation overrideAnnotation = new Annotation("Override");
+        List<Annotation> annotations = List.of(overrideAnnotation);
+        List<Integer> modifiers = List.of(Modifier.PUBLIC);
+        List<String> thrownExceptions = new ArrayList<>();
+        String returnType = "String";
+        String name = "toString";
+        List<Parameter> parameters = new ArrayList<>();
+        String body = composeToStringMethodBody(attributes);
 
-        var method = new Method(annotations, modifiers, thrownExceptions, returnType, name, parameters, body);
-        return method;
+        return new Method(annotations, modifiers, thrownExceptions, returnType, name, parameters, body);
     }
 }

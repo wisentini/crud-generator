@@ -2,6 +2,7 @@ package services.generator;
 
 import database.metadata.DatabaseMetadata;
 
+import database.metadata.TableMetadata;
 import exception.FileException;
 import org.apache.commons.io.FilenameUtils;
 import services.composer.ApplicationClassComposer;
@@ -14,8 +15,10 @@ import util.FileUtil;
 import util.FormatterUtil;
 import util.PropertiesUtil;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class CRUDGenerator {
     private final String databaseURL;
@@ -23,25 +26,22 @@ public class CRUDGenerator {
     private final String daoClassesDir;
     private final String exampleClassesDir;
     private final String applicationClassDir;
-    private List<EntityClass> entityClasses;
-    private List<DAOClass> daoClasses;
-    private List<ExampleClass> exampleClasses;
+
+    private final List<EntityClass> entityClasses = new ArrayList<>();
+    private final List<DAOClass> daoClasses = new ArrayList<>();
+    private final List<ExampleClass> exampleClasses = new ArrayList<>();
 
     public CRUDGenerator() throws Exception {
         try {
-            var properties = PropertiesUtil.getProperties();
+            Properties properties = PropertiesUtil.getProperties();
 
             this.databaseURL = properties.getProperty("database.url");
             this.entityClassesDir = properties.getProperty("entityClass.dir");
             this.daoClassesDir = properties.getProperty("daoClass.dir");
             this.exampleClassesDir = properties.getProperty("exampleClass.dir");
             this.applicationClassDir = properties.getProperty("applicationClass.dir");
-
-            this.entityClasses = new ArrayList<>();
-            this.daoClasses = new ArrayList<>();
-            this.exampleClasses = new ArrayList<>();
         } catch (Exception e) {
-            var message = "\nCouldn't load properties file.\n";
+            String message = "\nCouldn't load properties file.\n";
             throw new Exception(message);
         }
     }
@@ -51,7 +51,7 @@ public class CRUDGenerator {
 
         System.out.println("\nGenerating application class...");
 
-        var applicationClass = ApplicationClassComposer.composeClass(this.exampleClasses);
+        BaseClass applicationClass = ApplicationClassComposer.composeClass(this.exampleClasses);
 
         System.out.println("\nApplication class have been generated!\n");
 
@@ -69,21 +69,21 @@ public class CRUDGenerator {
     }
 
     private void generateEntityClasses() {
-        if (!(this.entityClasses == null || this.entityClasses.isEmpty())) {
+        if (!this.entityClasses.isEmpty()) {
             return;
         }
 
         System.out.println("\nGenerating entity classes...");
 
         try {
-            var connection = DatabaseUtil.getConnection(this.databaseURL);
-            var databaseMetadata = new DatabaseMetadata(connection);
-            var tablesMetadata = databaseMetadata.getTablesMetadata();
+            Connection connection = DatabaseUtil.getConnection(this.databaseURL);
+            DatabaseMetadata databaseMetadata = new DatabaseMetadata(connection);
+            List<TableMetadata> tablesMetadata = databaseMetadata.getTablesMetadata();
 
-            var classPackage = FileUtil.getNameFrom(this.entityClassesDir);
+            String classPackage = FileUtil.getNameFrom(this.entityClassesDir);
 
-            for (var tableMetadata : tablesMetadata) {
-                var entityClass = EntityClassComposer.composeClass(tableMetadata, classPackage);
+            for (TableMetadata tableMetadata : tablesMetadata) {
+                EntityClass entityClass = EntityClassComposer.composeClass(tableMetadata, classPackage);
                 this.writeToFile(entityClass, this.entityClassesDir);
                 this.entityClasses.add(entityClass);
             }
@@ -95,7 +95,7 @@ public class CRUDGenerator {
     }
 
     private void generateDAOClasses() {
-        if (!(this.daoClasses == null || this.daoClasses.isEmpty())) {
+        if (!this.daoClasses.isEmpty()) {
             return;
         }
 
@@ -103,10 +103,10 @@ public class CRUDGenerator {
 
         System.out.println("\nGenerating DAO classes...");
 
-        var classPackage = FileUtil.getNameFrom(this.daoClassesDir);
+        String classPackage = FileUtil.getNameFrom(this.daoClassesDir);
 
-        for (var entityClass : this.entityClasses) {
-            var daoClass = DAOClassComposer.composeClass(entityClass, classPackage);
+        for (EntityClass entityClass : this.entityClasses) {
+            DAOClass daoClass = DAOClassComposer.composeClass(entityClass, classPackage);
             this.writeToFile(daoClass, this.daoClassesDir);
             this.daoClasses.add(daoClass);
         }
@@ -115,7 +115,7 @@ public class CRUDGenerator {
     }
 
     private void generateExampleClasses() {
-        if (!(this.exampleClasses == null || this.exampleClasses.isEmpty())) {
+        if (!this.exampleClasses.isEmpty()) {
             return;
         }
 
@@ -123,10 +123,10 @@ public class CRUDGenerator {
 
         System.out.println("\nGenerating example classes...");
 
-        var classPackage = FileUtil.getNameFrom(this.exampleClassesDir);
+        String classPackage = FileUtil.getNameFrom(this.exampleClassesDir);
 
-        for (var daoClass : this.daoClasses) {
-            var exampleClass = ExampleClassComposer.composeClass(classPackage, daoClass);
+        for (DAOClass daoClass : this.daoClasses) {
+            ExampleClass exampleClass = ExampleClassComposer.composeClass(classPackage, daoClass);
             this.writeToFile(exampleClass, this.exampleClassesDir);
             this.exampleClasses.add(exampleClass);
         }
@@ -136,15 +136,14 @@ public class CRUDGenerator {
 
     private void writeToFile(BaseClass baseClass, String targetDirectory) {
         try {
-            var className = baseClass.getName();
-            var sourceCode = baseClass.toString();
-            var formattedSourceCode = FormatterUtil.format(sourceCode);
-            var filename = String.format("%s.java", className);
-            var pathname = FilenameUtils.concat(targetDirectory, filename);
+            String className = baseClass.getName();
+            String sourceCode = baseClass.toString();
+            String formattedSourceCode = FormatterUtil.format(sourceCode);
+            String filename = String.format("%s.java", className);
+            String pathname = FilenameUtils.concat(targetDirectory, filename);
             FileUtil.writeTo(formattedSourceCode, pathname);
         } catch (FileException fileException) {
-            var message = fileException.getMessage();
-            System.err.println(message);
+            fileException.printStackTrace();
         }
     }
 }

@@ -20,7 +20,7 @@ public class TableMetadata {
     }
 
     public ColumnMetadata getPrimaryKeyColumn() {
-        for (var columnMetadata : this.columnsMetadata) {
+        for (ColumnMetadata columnMetadata : this.columnsMetadata) {
             if (columnMetadata.getIsPrimaryKey()) {
                 return columnMetadata;
             }

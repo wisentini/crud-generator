@@ -33,28 +33,27 @@ public class BaseClass {
 
     @Override
     public String toString() {
-        var classPackage = ComposerUtil.composeClassPackage(this.classPackage);
-        var imports = ComposerUtil.composeImports(this.imports);
-        var modifiers = ComposerUtil.composeModifiers(this.modifiers);
-        var attributes = ComposerUtil.composeAttributes(this.attributes);
-        var methods = ComposerUtil.composeMethods(this.methods);
-        var classesToExtend = ComposerUtil.composeClassesToExtend(this.classesToExtend);
-        var classesToImplement = ComposerUtil.composeClassesToImplement(this.classesToImplement);
+        String classPackage = ComposerUtil.composeClassPackage(this.classPackage);
+        String imports = ComposerUtil.composeImports(this.imports);
+        String modifiers = ComposerUtil.composeModifiers(this.modifiers);
+        String attributes = ComposerUtil.composeAttributes(this.attributes);
+        String methods = ComposerUtil.composeMethods(this.methods);
+        String classesToExtend = ComposerUtil.composeClassesToExtend(this.classesToExtend);
+        String classesToImplement = ComposerUtil.composeClassesToImplement(this.classesToImplement);
 
         var result = """
+            %s
+            
+            %s
+            
+            %s class %s %s %s {
                 %s
                 
                 %s
-                
-                %s class %s %s %s {
-                    %s
-                    
-                    %s
-                }
-                """.formatted(classPackage, imports, modifiers, this.name, classesToExtend, classesToImplement, attributes, methods);
+            }
+            """.formatted(classPackage, imports, modifiers, this.name, classesToExtend, classesToImplement, attributes, methods);
 
-        var trimmedResult = result.trim();
-        return trimmedResult;
+        return result.trim();
     }
 
     public String getName() {

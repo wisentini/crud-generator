@@ -12,12 +12,11 @@ public class DatabaseUtil {
     private static final String AVAILABLE_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&*?";
 
     public static Connection getConnection(String databaseURL) throws SQLException {
-        var connection = DriverManager.getConnection(databaseURL);
-        return connection;
+        return DriverManager.getConnection(databaseURL);
     }
 
     public static Class<?> convertSQLTypeToClass(int type) {
-        var typeClass = switch (type) {
+        return switch (type) {
             case Types.CHAR, Types.VARCHAR, Types.LONGVARCHAR -> String.class;
             case Types.NUMERIC, Types.DECIMAL -> BigDecimal.class;
             case Types.BIT -> boolean.class;
@@ -33,15 +32,13 @@ public class DatabaseUtil {
             case Types.TIMESTAMP -> Timestamp.class;
             default -> Object.class;
         };
-
-        return typeClass;
     }
 
     private static String generateRandomString(int size) {
-        var availableCharactersLength = AVAILABLE_CHARACTERS.length();
+        int availableCharactersLength = AVAILABLE_CHARACTERS.length();
 
-        var random = new SecureRandom();
-        var finalSize = size;
+        SecureRandom random = new SecureRandom();
+        int finalSize = size;
 
         if (size <= 0) {
             throw new IllegalArgumentException("String size must be a positive integer.");
@@ -49,55 +46,46 @@ public class DatabaseUtil {
             finalSize = random.nextInt(MIN_STRING_SIZE, MAX_STRING_SIZE);
         }
 
-        var stringBuilder = new StringBuilder(finalSize);
+        StringBuilder stringBuilder = new StringBuilder(finalSize);
 
         stringBuilder.append('"');
 
         for (int i = 0; i < finalSize; i++) {
-            var randomIndex = random.nextInt(availableCharactersLength);
-            var randomCharacter = AVAILABLE_CHARACTERS.charAt(randomIndex);
+            int randomIndex = random.nextInt(availableCharactersLength);
+            char randomCharacter = AVAILABLE_CHARACTERS.charAt(randomIndex);
             stringBuilder.append(randomCharacter);
         }
 
         stringBuilder.append('"');
 
-        var stringBuilderString = stringBuilder.toString();
-        return stringBuilderString;
+        return stringBuilder.toString();
     }
 
     public static String generateValue(String type, int size) {
-        var random = new SecureRandom();
+        SecureRandom random = new SecureRandom();
 
         return switch (type) {
             case "int", "Integer" -> {
-                var randomInt = random.nextInt(size);
-                var randomIntString = String.valueOf(randomInt);
-                yield randomIntString;
+                int randomInt = random.nextInt(size);
+                yield String.valueOf(randomInt);
             }
             case "long", "Long" -> {
-                var randomLong = random.nextLong(size);
-                var randomLongString = String.valueOf(randomLong);
-                yield randomLongString;
+                long randomLong = random.nextLong(size);
+                yield String.valueOf(randomLong);
             }
             case "boolean", "Boolean" -> {
-                var randomBoolean = random.nextBoolean();
-                var randomBooleanString = String.valueOf(randomBoolean);
-                yield randomBooleanString;
+                boolean randomBoolean = random.nextBoolean();
+                yield String.valueOf(randomBoolean);
             }
             case "float", "Float" -> {
-                var randomFloat = random.nextFloat(size);
-                var randomFloatString = String.valueOf(randomFloat);
-                yield randomFloatString;
+                float randomFloat = random.nextFloat(size);
+                yield String.valueOf(randomFloat);
             }
             case "double", "Double" -> {
-                var randomDouble = random.nextDouble(size);
-                var randomDoubleString = String.valueOf(randomDouble);
-                yield randomDoubleString;
+                double randomDouble = random.nextDouble(size);
+                yield String.valueOf(randomDouble);
             }
-            case "char", "Character", "String" -> {
-                var randomString = generateRandomString(size);
-                yield randomString;
-            }
+            case "char", "Character", "String" -> generateRandomString(size);
             default -> null;
         };
     }

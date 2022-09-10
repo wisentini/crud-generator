@@ -32,14 +32,12 @@ public class ColumnMetadata {
     }
 
     public Class<?> getTypeClass() {
-        var typeClass = DatabaseUtil.convertSQLTypeToClass(this.type);
-        return typeClass;
+        return DatabaseUtil.convertSQLTypeToClass(this.type);
     }
 
     public String getTypeClassName() {
-        var typeClass = this.getTypeClass();
-        var typeClassName = typeClass.getSimpleName();
-        return typeClassName;
+        Class<?> typeClass = this.getTypeClass();
+        return typeClass.getSimpleName();
     }
 
     public String getRemarks() {

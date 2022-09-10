@@ -9,18 +9,16 @@ import java.sql.Timestamp;
 public class ClassUtil {
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getWrapperClass(Class<T> clazz) {
-        var wrapperClass = (Class<T>) MethodType.methodType(clazz).wrap().returnType();
-        return wrapperClass;
+        return (Class<T>)MethodType.methodType(clazz).wrap().returnType();
     }
 
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getPrimitiveClass(Class<T> clazz) {
-        var primitiveClass = (Class<T>) MethodType.methodType(clazz).unwrap().returnType();
-        return primitiveClass;
+        return (Class<T>)MethodType.methodType(clazz).unwrap().returnType();
     }
 
     public static Class<?> getWrapperClassFromPrimitiveClassString(String primitiveClassString) {
-        var wrapperClass = switch (primitiveClassString) {
+        return switch (primitiveClassString) {
             case "String" -> String.class;
             case "BigDecimal" -> BigDecimal.class;
             case "boolean" -> Boolean.class;
@@ -36,12 +34,10 @@ public class ClassUtil {
             case "Timestamp" -> Timestamp.class;
             default -> Object.class;
         };
-
-        return wrapperClass;
     }
 
     public static Class<?> getPrimitiveClassFromWrapperClassString(String wrapperClassString) {
-        var primitiveClass = switch (wrapperClassString) {
+        return switch (wrapperClassString) {
             case "String" -> String.class;
             case "BigDecimal" -> BigDecimal.class;
             case "Boolean" -> boolean.class;
@@ -57,7 +53,5 @@ public class ClassUtil {
             case "Timestamp" -> Timestamp.class;
             default -> Object.class;
         };
-
-        return primitiveClass;
     }
 }

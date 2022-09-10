@@ -1,16 +1,27 @@
 package util;
 
 public class StringUtil {
-    public static String decapitalize(String string) {
+    public static String capitalize(String string) {
         if (string == null || string.length() == 0) {
             return string;
         }
 
-        var charArray = string.toCharArray();
-        var character = charArray[0];
-        charArray[0] = Character.toLowerCase(character);
-        var decapitalizedString = new String(charArray);
+        char[] charArray = string.toCharArray();
+        char character = charArray[0];
+        charArray[0] = Character.toUpperCase(character);
 
-        return decapitalizedString;
+        return new String(charArray);
+    }
+
+    public static String composeGetterMethodName(String attribute) {
+        String lowerCaseAttribute = attribute.toLowerCase();
+        String attributeCapitalized = capitalize(lowerCaseAttribute);
+        return String.format("get%s", attributeCapitalized);
+    }
+
+    public static String composeSetterMethodName(String attribute) {
+        String lowerCaseAttribute = attribute.toLowerCase();
+        String attributeCapitalized = capitalize(lowerCaseAttribute);
+        return String.format("set%s", attributeCapitalized);
     }
 }

@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
 
 public class ComposerUtil {
     public static String composeImports(List<String> imports) {
-        var stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
 
-        for (var importString : imports) {
-            var formattedImport = String.format("import %s;\n", importString);
+        for (String importString : imports) {
+            String formattedImport = String.format("import %s;\n", importString);
             stringBuilder.append(formattedImport);
         }
 
@@ -20,10 +20,10 @@ public class ComposerUtil {
     }
 
     public static String composeAttributes(List<Attribute> attributes) {
-        var stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
 
-        for (var attribute : attributes) {
-            var string = String.format("%s;\n", attribute);
+        for (Attribute attribute : attributes) {
+            String string = String.format("%s;\n", attribute);
             stringBuilder.append(string);
         }
 
@@ -47,14 +47,13 @@ public class ComposerUtil {
     }
 
     public static String composeModifiers(List<Integer> modifiers) {
-        var totalSumOfModifiers = 0;
+        int totalSumOfModifiers = 0;
 
-        for (var modifier : modifiers) {
+        for (int modifier : modifiers) {
             totalSumOfModifiers += modifier;
         }
 
-        var modifiersString = Modifier.toString(totalSumOfModifiers);
-        return modifiersString;
+        return Modifier.toString(totalSumOfModifiers);
     }
 
     public static String composeThrownExceptions(List<String> thrownExceptions) {
@@ -78,7 +77,7 @@ public class ComposerUtil {
         if (classesToExtend == null || classesToExtend.isEmpty()) {
             return "";
         } else {
-            var classes = String.join(", ", classesToExtend);
+            String classes = String.join(", ", classesToExtend);
             return String.format("extends %s", classes);
         }
     }
@@ -87,7 +86,7 @@ public class ComposerUtil {
         if (classesToImplement == null || classesToImplement.isEmpty()) {
             return "";
         } else {
-            var classes = String.join(", ", classesToImplement);
+            String classes = String.join(", ", classesToImplement);
             return String.format("implements %s", classes);
         }
     }

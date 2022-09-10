@@ -27,7 +27,7 @@ services:
     networks:
       - crudgenerator-network
     depends_on:
-      - crudgenerator_db
+      - crudgenerator-db
 
 networks:
   crudgenerator-network:

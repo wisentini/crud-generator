@@ -2,6 +2,7 @@ package database.metadata;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +17,13 @@ public class DatabaseMetadata {
     public List<TableMetadata> getTablesMetadata() throws SQLException {
         String[] types = {"TABLE"};
 
-        var resultSet = this.databaseMetadata.getTables(null, null, null, types);
-        var tablesMetadata = new ArrayList<TableMetadata>();
+        ResultSet resultSet = this.databaseMetadata.getTables(null, null, null, types);
+        ArrayList<TableMetadata> tablesMetadata = new ArrayList<>();
 
         while (resultSet.next()) {
-            var tableName = resultSet.getString("TABLE_NAME");
-            var columnsMetadata = this.getColumnsMetadata(tableName);
-            var tableMetadata = new TableMetadata(tableName, columnsMetadata);
+            String tableName = resultSet.getString("TABLE_NAME");
+            List<ColumnMetadata> columnsMetadata = this.getColumnsMetadata(tableName);
+            TableMetadata tableMetadata = new TableMetadata(tableName, columnsMetadata);
             tablesMetadata.add(tableMetadata);
         }
 
@@ -30,20 +31,20 @@ public class DatabaseMetadata {
     }
 
     public List<ColumnMetadata> getColumnsMetadata(String tableName) throws SQLException {
-        var columnsMetadata = new ArrayList<ColumnMetadata>();
-        var primaryKeyColumnNames = this.getPrimaryKeyColumnNames(tableName);
-        var resultSet = this.databaseMetadata.getColumns(null, null, tableName, null);
+        ArrayList<ColumnMetadata> columnsMetadata = new ArrayList<>();
+        List<String> primaryKeyColumnNames = this.getPrimaryKeyColumnNames(tableName);
+        ResultSet resultSet = this.databaseMetadata.getColumns(null, null, tableName, null);
 
         while (resultSet.next()) {
-            var columnName = resultSet.getString("COLUMN_NAME");
-            var columnType = resultSet.getInt("DATA_TYPE");
-            var columnRemarks = resultSet.getString("REMARKS");
-            var columnSize = resultSet.getInt("COLUMN_SIZE");
-            var columnIsNullable = resultSet.getString("IS_NULLABLE");
-            var columnIsAutoincrement = resultSet.getString("IS_AUTOINCREMENT");
-            var columnIsPrimaryKey = primaryKeyColumnNames.contains(columnName);
+            String columnName = resultSet.getString("COLUMN_NAME");
+            int columnType = resultSet.getInt("DATA_TYPE");
+            String columnRemarks = resultSet.getString("REMARKS");
+            int columnSize = resultSet.getInt("COLUMN_SIZE");
+            String columnIsNullable = resultSet.getString("IS_NULLABLE");
+            String columnIsAutoincrement = resultSet.getString("IS_AUTOINCREMENT");
+            boolean columnIsPrimaryKey = primaryKeyColumnNames.contains(columnName);
 
-            var columnMetadata = new ColumnMetadata(columnName, columnType, columnRemarks, columnSize, columnIsNullable, columnIsAutoincrement, columnIsPrimaryKey, tableName);
+            ColumnMetadata columnMetadata = new ColumnMetadata(columnName, columnType, columnRemarks, columnSize, columnIsNullable, columnIsAutoincrement, columnIsPrimaryKey, tableName);
             columnsMetadata.add(columnMetadata);
         }
 
@@ -51,11 +52,11 @@ public class DatabaseMetadata {
     }
 
     private List<String> getPrimaryKeyColumnNames(String tableName) throws SQLException {
-        var primaryKeyColumnNames = new ArrayList<String>();
-        var resultSet = this.databaseMetadata.getPrimaryKeys(null, null, tableName);
+        ArrayList<String> primaryKeyColumnNames = new ArrayList<>();
+        ResultSet resultSet = this.databaseMetadata.getPrimaryKeys(null, null, tableName);
 
         while (resultSet.next()) {
-            var primaryKeyColumnName = resultSet.getString("COLUMN_NAME");
+            String primaryKeyColumnName = resultSet.getString("COLUMN_NAME");
             primaryKeyColumnNames.add(primaryKeyColumnName);
         }
 

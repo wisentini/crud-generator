@@ -14,28 +14,27 @@ public class EntityClass extends BaseClass {
 
     @Override
     public String toString() {
-        var imports = ComposerUtil.composeImports(this.imports);
-        var annotations = ComposerUtil.composeAnnotations(this.annotations);
-        var modifiers = ComposerUtil.composeModifiers(this.modifiers);
-        var attributes = ComposerUtil.composeAttributes(this.attributes);
-        var methods = ComposerUtil.composeMethods(this.methods);
-        var classesToExtend = ComposerUtil.composeClassesToExtend(this.classesToExtend);
-        var classesToImplement = ComposerUtil.composeClassesToImplement(this.classesToImplement);
+        String imports = ComposerUtil.composeImports(this.imports);
+        String annotations = ComposerUtil.composeAnnotations(this.annotations);
+        String modifiers = ComposerUtil.composeModifiers(this.modifiers);
+        String attributes = ComposerUtil.composeAttributes(this.attributes);
+        String methods = ComposerUtil.composeMethods(this.methods);
+        String classesToExtend = ComposerUtil.composeClassesToExtend(this.classesToExtend);
+        String classesToImplement = ComposerUtil.composeClassesToImplement(this.classesToImplement);
 
         var string = """
-                package %s;
-                
+            package %s;
+            
+            %s
+            
+            %s %s class %s %s %s {
                 %s
                 
-                %s %s class %s %s %s {
-                    %s
-                    
-                    %s
-                }
-                """.formatted(this.classPackage, imports, annotations, modifiers, this.name, classesToExtend, classesToImplement, attributes, methods);
+                %s
+            }
+            """.formatted(this.classPackage, imports, annotations, modifiers, this.name, classesToExtend, classesToImplement, attributes, methods);
 
-        var trimmedString = string.trim();
-        return trimmedString;
+        return string.trim();
     }
 
     public Class<?> getPrimaryKeyColumnClass() {

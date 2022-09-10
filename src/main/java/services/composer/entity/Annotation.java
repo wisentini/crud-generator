@@ -7,9 +7,7 @@ public class Annotation {
     private String name;
     private List<AnnotationElement> annotationElements;
 
-    public Annotation() {
-
-    }
+    public Annotation() {}
 
     public Annotation(String name) {
         this.name = name;
@@ -22,17 +20,16 @@ public class Annotation {
 
     @Override
     public String toString() {
-        var annotationNameString = String.format("@%s", this.name);
-        var stringBuilder = new StringBuilder(annotationNameString);
+        String annotationNameString = String.format("@%s", this.name);
+        StringBuilder stringBuilder = new StringBuilder(annotationNameString);
 
         if (this.annotationElements != null && !this.annotationElements.isEmpty()) {
-            var elementsString = this.annotationElements.stream().map(AnnotationElement::toString).collect(Collectors.joining(", "));
-            var annotationBodyString = String.format("(%s)", elementsString);
+            String elementsString = this.annotationElements.stream().map(AnnotationElement::toString).collect(Collectors.joining(", "));
+            String annotationBodyString = String.format("(%s)", elementsString);
             stringBuilder.append(annotationBodyString);
         }
 
-        var string = stringBuilder.toString();
-        return string;
+        return stringBuilder.toString();
     }
 
     public String getName() {

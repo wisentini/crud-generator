@@ -2,16 +2,16 @@ package util;
 
 import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.FormatterException;
+import com.google.googlejavaformat.java.JavaFormatterOptions;
 
 public class FormatterUtil {
     public static String format(String sourceCode) {
         try {
-            var formatter = new Formatter();
-            var formattedSourceCode = formatter.formatSource(sourceCode);
-            return formattedSourceCode;
+            JavaFormatterOptions javaFormatterOptions = JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.AOSP).build();
+            Formatter formatter = new Formatter(javaFormatterOptions);
+            return formatter.formatSourceAndFixImports(sourceCode);
         } catch (FormatterException formatterException) {
-            var message = formatterException.getMessage();
-            System.err.println(message);
+            System.err.println(formatterException.getMessage());
         }
 
         return sourceCode;

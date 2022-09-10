@@ -28,8 +28,7 @@ public abstract class BaseExample<PK extends Serializable, Entity extends BaseEn
             this.deleteOneByID();
             this.findAll();
         } catch (DatabaseException databaseException) {
-            var message = databaseException.getMessage();
-            System.err.println(message);
+            System.err.println(databaseException.getMessage());
         }
     }
 
@@ -40,8 +39,8 @@ public abstract class BaseExample<PK extends Serializable, Entity extends BaseEn
     protected Entity findOne() throws DatabaseException {
         System.out.println("\nFinding entity...");
 
-        var id = this.entity.getid();
-        var entity = this.dao.find(id);
+        PK id = this.entity.getId();
+        Entity entity = this.dao.find(id);
 
         System.out.print("\nEntity found:");
         System.out.printf("\n\t%s\n", entity);
@@ -50,12 +49,12 @@ public abstract class BaseExample<PK extends Serializable, Entity extends BaseEn
     }
 
     protected List<Entity> findAll() throws DatabaseException {
-        var entities = this.dao.find();
+        List<Entity> entities = this.dao.find();
 
         System.out.println("\nFinding entities...");
         System.out.print("\nEntities found:");
 
-        for (var entity : entities) {
+        for (Entity entity : entities) {
             System.out.printf("\n\t%s", entity);
         }
 
@@ -67,7 +66,7 @@ public abstract class BaseExample<PK extends Serializable, Entity extends BaseEn
     protected void deleteOneByID() throws DatabaseException {
         System.out.print("\nDeleting entity:");
 
-        var id = this.entity.getid();
+        PK id = this.entity.getId();
 
         System.out.printf("\n\t%s\n", entity);
 
@@ -77,7 +76,7 @@ public abstract class BaseExample<PK extends Serializable, Entity extends BaseEn
     protected void deleteOneByEntity() throws DatabaseException {
         System.out.print("\nDeleting entity:");
 
-        var entity = this.findOne();
+        Entity entity = this.findOne();
 
         System.out.printf("\n\t%s\n", entity);
 

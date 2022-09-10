@@ -31,12 +31,11 @@ public class Attribute {
 
     @Override
     public String toString() {
-        var annotations = ComposerUtil.composeAnnotations(this.annotations);
-        var modifiers = ComposerUtil.composeModifiers(this.modifiers);
+        String annotations = ComposerUtil.composeAnnotations(this.annotations);
+        String modifiers = ComposerUtil.composeModifiers(this.modifiers);
 
-        var string = String.format("%s %s %s %s", annotations, modifiers, this.type, this.name);
-        var trimmedString = string.trim();
-        return trimmedString;
+        String string = String.format("%s %s %s %s", annotations, modifiers, this.type, this.name);
+        return string.trim();
     }
 
     public String getName() {

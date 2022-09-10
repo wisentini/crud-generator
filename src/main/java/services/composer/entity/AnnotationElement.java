@@ -19,7 +19,7 @@ public class AnnotationElement {
 
     @Override
     public String toString() {
-        var string = "";
+        String string = "";
 
         if (this.name == null) {
             string = String.format("\"%s\"", this.value);

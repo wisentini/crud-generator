@@ -29,16 +29,16 @@ public class Method {
 
     @Override
     public String toString() {
-        var annotations = ComposerUtil.composeAnnotations(this.annotations);
-        var modifiers = ComposerUtil.composeModifiers(this.modifiers);
-        var thrownExceptions = ComposerUtil.composeThrownExceptions(this.thrownExceptions);
-        var parameters = ComposerUtil.composeParameters(this.parameters);
+        String annotations = ComposerUtil.composeAnnotations(this.annotations);
+        String modifiers = ComposerUtil.composeModifiers(this.modifiers);
+        String thrownExceptions = ComposerUtil.composeThrownExceptions(this.thrownExceptions);
+        String parameters = ComposerUtil.composeParameters(this.parameters);
 
         var string = """
-                %s %s %s %s(%s) %s {
-                    %s
-                }
-                """.formatted(annotations, modifiers, returnType, this.name, parameters, thrownExceptions, this.body);
+            %s %s %s %s(%s) %s {
+                %s
+            }
+            """.formatted(annotations, modifiers, returnType, this.name, parameters, thrownExceptions, this.body);
 
         return string.trim();
     }

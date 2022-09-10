@@ -21,8 +21,7 @@ public class Parameter {
 
     @Override
     public String toString() {
-        var string = String.format("%s %s", this.type, this.name);
-        return string;
+        return String.format("%s %s", this.type, this.name);
     }
 
     public String getName() {

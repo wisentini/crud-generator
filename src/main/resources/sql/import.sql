@@ -4,32 +4,29 @@ DROP TABLE IF EXISTS "Estado";
 
 DROP TABLE IF EXISTS "Municipio";
 
-
 CREATE TABLE "Regiao" (
-    codigo INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    nome VARCHAR(31) NOT NULL
+    codigo INT         NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    nome   VARCHAR(31) NOT NULL
 );
 
-CREATE TABLE "Estado" (
-    codigo INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    nome VARCHAR(63) NOT NULL,
-    uf CHAR(2) NOT NULL,
-    codigoRegiao INT NOT NULL
+CREATE TABLE IF NOT EXISTS "Estado" (
+    codigo       INT         NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    nome         VARCHAR(63) NOT NULL,
+    uf           CHAR(2)     NOT NULL,
+    codigoRegiao INT         NOT NULL
 );
 
-CREATE TABLE "Municipio" (
-    codigo INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    nome VARCHAR(255) NOT NULL,
-    uf CHAR(2) NOT NULL
+CREATE TABLE IF NOT EXISTS "Municipio" (
+    codigo INT          NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    nome   VARCHAR(255) NOT NULL,
+    uf     CHAR(2)      NOT NULL
 );
-
 
 INSERT INTO "Regiao" (nome) VALUES ('Norte');
 INSERT INTO "Regiao" (nome) VALUES ('Nordeste');
 INSERT INTO "Regiao" (nome) VALUES ('Sudeste');
 INSERT INTO "Regiao" (nome) VALUES ('Sul');
 INSERT INTO "Regiao" (nome) VALUES ('Centro-Oeste');
-
 
 INSERT INTO "Estado" (nome, uf, codigoRegiao) VALUES ('Acre', 'AC', 1);
 INSERT INTO "Estado" (nome, uf, codigoRegiao) VALUES ('Alagoas', 'AL', 2);
@@ -58,7 +55,6 @@ INSERT INTO "Estado" (nome, uf, codigoRegiao) VALUES ('Santa Catarina', 'SC', 4)
 INSERT INTO "Estado" (nome, uf, codigoRegiao) VALUES ('São Paulo', 'SP', 3);
 INSERT INTO "Estado" (nome, uf, codigoRegiao) VALUES ('Sergipe', 'SE', 2);
 INSERT INTO "Estado" (nome, uf, codigoRegiao) VALUES ('Tocantins', 'TO', 1);
-
 
 INSERT INTO "Municipio" (nome, uf) VALUES ('Aceguá', 'RS');
 INSERT INTO "Municipio" (nome, uf) VALUES ('Água Santa', 'RS');

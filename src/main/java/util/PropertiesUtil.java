@@ -2,6 +2,7 @@ package util;
 
 import exception.FileException;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
@@ -10,9 +11,9 @@ public class PropertiesUtil {
 
     public static Properties getProperties() throws FileException {
         try {
-            var file = FileUtil.loadFile(PATHNAME);
-            var inputStream = new FileInputStream(file);
-            var properties = new Properties();
+            File file = FileUtil.loadFile(PATHNAME);
+            FileInputStream inputStream = new FileInputStream(file);
+            Properties properties = new Properties();
             properties.load(inputStream);
             return properties;
         } catch (Exception exception) {

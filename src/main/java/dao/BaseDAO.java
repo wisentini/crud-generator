@@ -8,8 +8,8 @@ import java.io.Serializable;
 import java.util.List;
 
 public class BaseDAO<ID extends Serializable, Entity extends BaseEntity<ID>> {
-    private Class<Entity> entityClass;
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
+    private final Class<Entity> entityClass;
 
     public BaseDAO(EntityManager entityManager, Class<Entity> entityClass) {
         this.entityManager = entityManager;
@@ -96,8 +96,7 @@ public class BaseDAO<ID extends Serializable, Entity extends BaseEntity<ID>> {
 
     public Entity find(ID id) throws DatabaseException {
         try {
-            var entity = this.entityManager.find(this.entityClass, id);
-            return entity;
+            return this.entityManager.find(this.entityClass, id);
         } catch (IllegalArgumentException illegalArgumentException) {
             throw new DatabaseException("Couldn't find entity either because first argument does not denote an entity type or the second argument is not a valid type for that entity's primary key or is null.");
         }
@@ -105,8 +104,7 @@ public class BaseDAO<ID extends Serializable, Entity extends BaseEntity<ID>> {
 
     public Query createQuery(String string) throws DatabaseException {
         try {
-            var query = this.entityManager.createQuery(string);
-            return query;
+            return this.entityManager.createQuery(string);
         } catch (IllegalArgumentException illegalArgumentException) {
             throw new DatabaseException("Couldn't create query because it was found to be invalid.");
         }
@@ -115,9 +113,8 @@ public class BaseDAO<ID extends Serializable, Entity extends BaseEntity<ID>> {
     @SuppressWarnings("unchecked")
     public ID createQueryWithSingleResult(String string, Class<ID> resultClass) throws DatabaseException {
         try {
-            var query = this.entityManager.createNativeQuery(string);
-            var result = (ID) query.getSingleResult();
-            return result;
+            Query query = this.entityManager.createNativeQuery(string);
+            return (ID)query.getSingleResult();
         } catch (IllegalArgumentException illegalArgumentException) {
             throw new DatabaseException("Couldn't create query because it was found to be invalid.");
         }
@@ -126,10 +123,9 @@ public class BaseDAO<ID extends Serializable, Entity extends BaseEntity<ID>> {
     @SuppressWarnings("unchecked")
     public List<Entity> find() throws DatabaseException {
         try {
-            var string = String.format("from %s", this.entityClass.getSimpleName());
-            var query = this.createQuery(string);
-            var entities = query.getResultList();
-            return entities;
+            String string = String.format("from %s", this.entityClass.getSimpleName());
+            Query query = this.createQuery(string);
+            return query.getResultList();
         } catch (IllegalArgumentException illegalArgumentException) {
             throw new DatabaseException("\"getResultList\" can't be called for a Java Persistence query language UPDATE or DELETE statement.");
         } catch (QueryTimeoutException queryTimeoutException) {
@@ -151,7 +147,7 @@ public class BaseDAO<ID extends Serializable, Entity extends BaseEntity<ID>> {
         try {
             entityTransaction = this.getEntityTransaction();
             this.beginEntityTransaction(entityTransaction);
-            var entity = this.find(id);
+            Entity entity = this.find(id);
             this.entityManager.remove(entity);
             this.commitEntityTransaction(entityTransaction);
         } catch (IllegalArgumentException illegalArgumentException) {
@@ -191,9 +187,9 @@ public class BaseDAO<ID extends Serializable, Entity extends BaseEntity<ID>> {
             entityTransaction = this.getEntityTransaction();
             this.beginEntityTransaction(entityTransaction);
 
-            var entities = this.find();
+            List<Entity> entities = this.find();
 
-            for (var entity : entities) {
+            for (Entity entity : entities) {
                 this.delete(entity);
             }
 
